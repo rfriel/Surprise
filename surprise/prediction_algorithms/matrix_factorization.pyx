@@ -106,7 +106,7 @@ class SVD(AlgoBase):
     def __init__(self, n_factors=100, n_epochs=20, biased=True, lr_all=.005,
                  reg_all=.02, lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None,
                  reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
-                 verbose=False):
+                 verbose=False, init_rand=False, init_scale=0.1):
 
         self.n_factors = n_factors
         self.n_epochs = n_epochs
@@ -120,6 +120,8 @@ class SVD(AlgoBase):
         self.reg_pu = reg_pu if reg_pu is not None else reg_all
         self.reg_qi = reg_qi if reg_qi is not None else reg_all
         self.verbose = verbose
+        self.init_rand = init_rand
+        self.init_scale = init_scale
 
         AlgoBase.__init__(self)
 
@@ -187,8 +189,18 @@ class SVD(AlgoBase):
 
         bu = np.zeros(trainset.n_users, np.double)
         bi = np.zeros(trainset.n_items, np.double)
-        pu = np.zeros((trainset.n_users, self.n_factors), np.double) + .1
-        qi = np.zeros((trainset.n_items, self.n_factors), np.double) + .1
+
+        if self.init_rand:
+            pu = self.init_scale * np.random.randn(trainset.n_users, self.n_factors) / np.power(self.n_factors,1./4)
+            qi = self.init_scale * np.random.randn(trainset.n_items, self.n_factors) / np.power(self.n_factors,1./4)
+        else:
+            pu = np.zeros((trainset.n_users, self.n_factors), np.double) + self.init_scale
+            qi = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
+
+        self.bu = bu
+        self.bi = bi
+        self.pu = pu
+        self.qi = qi
 
         if not self.biased:
             global_mean = 0
@@ -307,7 +319,7 @@ class SVDpp(AlgoBase):
     def __init__(self, n_factors=20, n_epochs=20, lr_all=.007, reg_all=.02,
                  lr_bu=None, lr_bi=None, lr_pu=None, lr_qi=None, lr_yj=None,
                  reg_bu=None, reg_bi=None, reg_pu=None, reg_qi=None,
-                 reg_yj=None, verbose=False):
+                 reg_yj=None, verbose=False, init_rand=False, init_scale=0.1):
 
         self.n_factors = n_factors
         self.n_epochs = n_epochs
@@ -322,7 +334,9 @@ class SVDpp(AlgoBase):
         self.reg_qi = reg_qi if reg_qi is not None else reg_all
         self.reg_yj = reg_yj if reg_yj is not None else reg_all
         self.verbose = verbose
-
+        self.init_rand = init_rand
+        self.init_scale = init_scale
+        
         AlgoBase.__init__(self)
 
     def train(self, trainset):
@@ -362,9 +376,14 @@ class SVDpp(AlgoBase):
 
         bu = np.zeros(trainset.n_users, np.double)
         bi = np.zeros(trainset.n_items, np.double)
-        pu = np.zeros((trainset.n_users, self.n_factors), np.double) + .1
-        qi = np.zeros((trainset.n_items, self.n_factors), np.double) + .1
-        yj = np.zeros((trainset.n_items, self.n_factors), np.double) + .1
+        if self.init_rand:
+            pu = self.init_scale * np.random.randn(trainset.n_users, self.n_factors) / np.power(self.n_factors,1./4)
+            qi = self.init_scale * np.random.randn(trainset.n_items, self.n_factors) / np.power(self.n_factors,1./4)
+            yj = self.init_scale * np.random.randn(trainset.n_items, self.n_factors) / np.power(self.n_factors,1./4)
+        else:
+            pu = np.zeros((trainset.n_users, self.n_factors), np.double) + self.init_scale
+            qi = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
+            yj = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
         u_impl_fdb = np.zeros(self.n_factors, np.double)
 
         for current_epoch in range(self.n_epochs):
