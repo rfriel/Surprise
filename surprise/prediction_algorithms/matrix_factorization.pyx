@@ -190,13 +190,13 @@ class SVD(AlgoBase):
         bu = np.zeros(trainset.n_users, np.double)
         bi = np.zeros(trainset.n_items, np.double)
 
-        if self.init_rand:
-            rand_scale = self.init_scale / np.power(self.n_factors, 0.25)
-            pu = rand_scale * np.random.randn(trainset.n_users, self.n_factors)
-            qi = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
-        else:
-            pu = np.zeros((trainset.n_users, self.n_factors), np.double) + self.init_scale
-            qi = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
+        rand_scale = self.init_scale / np.power(self.n_factors, 0.25)
+        pu = rand_scale * np.random.randn(trainset.n_users, self.n_factors)
+        qi = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
+
+        if not self.init_rand:
+            pu = self.init_scale * np.ones_like(pu)
+            qi = self.init_scale * np.ones_like(qi)
 
         if not self.biased:
             global_mean = 0
@@ -372,15 +372,17 @@ class SVDpp(AlgoBase):
 
         bu = np.zeros(trainset.n_users, np.double)
         bi = np.zeros(trainset.n_items, np.double)
-        if self.init_rand:
-            rand_scale = self.init_scale / np.power(self.n_factors, 0.25)
-            pu = rand_scale * np.random.randn(trainset.n_users, self.n_factors)
-            qi = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
-            yj = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
-        else:
-            pu = np.zeros((trainset.n_users, self.n_factors), np.double) + self.init_scale
-            qi = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
-            yj = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
+
+        rand_scale = self.init_scale / np.power(self.n_factors, 0.25)
+        pu = rand_scale * np.random.randn(trainset.n_users, self.n_factors)
+        qi = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
+        yj = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
+
+        if not self.init_rand:
+            pu = self.init_scale * np.ones_like(pu)
+            qi = self.init_scale * np.ones_like(qi)
+            yj = self.init_scale * np.ones_like(yj)
+
         u_impl_fdb = np.zeros(self.n_factors, np.double)
 
         for current_epoch in range(self.n_epochs):
