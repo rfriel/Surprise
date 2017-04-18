@@ -191,16 +191,12 @@ class SVD(AlgoBase):
         bi = np.zeros(trainset.n_items, np.double)
 
         if self.init_rand:
-            pu = self.init_scale * np.random.randn(trainset.n_users, self.n_factors) / np.power(self.n_factors,1./4)
-            qi = self.init_scale * np.random.randn(trainset.n_items, self.n_factors) / np.power(self.n_factors,1./4)
+            rand_scale = self.init_scale / np.power(self.n_factors, 0.25)
+            pu = rand_scale * np.random.randn(trainset.n_users, self.n_factors)
+            qi = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
         else:
             pu = np.zeros((trainset.n_users, self.n_factors), np.double) + self.init_scale
             qi = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
-
-        self.bu = bu
-        self.bi = bi
-        self.pu = pu
-        self.qi = qi
 
         if not self.biased:
             global_mean = 0
@@ -336,7 +332,7 @@ class SVDpp(AlgoBase):
         self.verbose = verbose
         self.init_rand = init_rand
         self.init_scale = init_scale
-        
+
         AlgoBase.__init__(self)
 
     def train(self, trainset):
@@ -377,9 +373,10 @@ class SVDpp(AlgoBase):
         bu = np.zeros(trainset.n_users, np.double)
         bi = np.zeros(trainset.n_items, np.double)
         if self.init_rand:
-            pu = self.init_scale * np.random.randn(trainset.n_users, self.n_factors) / np.power(self.n_factors,1./4)
-            qi = self.init_scale * np.random.randn(trainset.n_items, self.n_factors) / np.power(self.n_factors,1./4)
-            yj = self.init_scale * np.random.randn(trainset.n_items, self.n_factors) / np.power(self.n_factors,1./4)
+            rand_scale = self.init_scale / np.power(self.n_factors, 0.25)
+            pu = rand_scale * np.random.randn(trainset.n_users, self.n_factors)
+            qi = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
+            yj = rand_scale * np.random.randn(trainset.n_items, self.n_factors)
         else:
             pu = np.zeros((trainset.n_users, self.n_factors), np.double) + self.init_scale
             qi = np.zeros((trainset.n_items, self.n_factors), np.double) + self.init_scale
